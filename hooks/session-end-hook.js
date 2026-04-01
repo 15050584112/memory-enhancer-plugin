@@ -114,6 +114,7 @@ function cleanupOldBackups(backupDir) {
 // ─── 工具函数 ──────────────────────────────────────────────────────────────
 
 function findMemoryDir(cwd) {
+  // 1. 向上查找项目内的 .claude/memory
   let dir = cwd;
   const root = path.parse(dir).root;
 
@@ -124,6 +125,12 @@ function findMemoryDir(cwd) {
     if (parent === dir || parent === root) break;
     dir = parent;
   }
+
+  // 2. 查找 ~/.claude/projects/<encoded-path>/memory
+  const home = process.env.HOME || '';
+  const encodedPath = '-' + cwd.replace(/\//g, '-').replace(/-+$/, '');
+  const projectMem = path.join(home, '.claude', 'projects', encodedPath, 'memory');
+  if (fs.existsSync(projectMem)) return projectMem;
 
   return null;
 }

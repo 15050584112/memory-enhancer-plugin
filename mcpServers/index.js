@@ -380,6 +380,7 @@ function ok(text) { return { content: [{ type: 'text', text }], isError: false }
 function err(text) { return { content: [{ type: 'text', text }], isError: true }; }
 
 function findMemoryDir(cwd) {
+  // 1. 向上查找项目内的 .claude/memory
   let dir = cwd;
   const root = path.parse(dir).root;
   for (let i = 0; i < 12; i++) {
@@ -389,6 +390,13 @@ function findMemoryDir(cwd) {
     if (p === dir || p === root) break;
     dir = p;
   }
+
+  // 2. 查找 ~/.claude/projects/<encoded-path>/memory
+  const home = process.env.HOME || '';
+  const encodedPath = '-' + cwd.replace(/\//g, '-').replace(/-+$/, '');
+  const projectMem = path.join(home, '.claude', 'projects', encodedPath, 'memory');
+  if (fs.existsSync(projectMem)) return projectMem;
+
   return null;
 }
 

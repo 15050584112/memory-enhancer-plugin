@@ -217,9 +217,10 @@ function writeAuditLog(memoryDir, data) {
 // ─── 工具函数 ──────────────────────────────────────────────���─────────────────
 
 /**
- * 向上查找最近的 .claude/memory 目录
+ * 向上查找最近的 .claude/memory ��录
  */
 function findMemoryDir(cwd) {
+  // 1. 向上查找项目内的 .claude/memory
   let dir = cwd;
   const root = path.parse(dir).root;
 
@@ -233,39 +234,14 @@ function findMemoryDir(cwd) {
     dir = parent;
   }
 
-  // 备用：直接查 HOME 下的标准路径
-  const homeMem = path.join(
-    process.env.HOME || '',
-    '.claude',
-    'projects',
-    sanitizeGitRoot(cwd),
-    'memory'
-  );
-  if (fs.existsSync(homeMem)) return homeMem;
+  // 2. 查找 ~/.claude/projects/<encoded-path>/memory
+  // Claude Code 路径映射: /Users/foo/bar → -Users-foo-bar
+  const home = process.env.HOME || '';
+  const encodedPath = '-' + cwd.replace(/\//g, '-').replace(/-+$/, '');
+  const projectMem = path.join(home, '.claude', 'projects', encodedPath, 'memory');
+  if (fs.existsSync(projectMem)) return projectMem;
 
   return null;
-}
-
-/**
- * 简化版 git root 检测（用于标准记忆路径）
- */
-function sanitizeGitRoot(cwd) {
-  let dir = cwd;
-  const root = path.parse(dir).root;
-
-  for (let i = 0; i < 10; i++) {
-    if (fs.existsSync(path.join(dir, '.git'))) {
-      return dir
-        .replace(/[^a-zA-Z0-9_\-.+]/g, '_')
-        .replace(/^_+/, '')
-        .replace(/_+$/, '');
-    }
-    const parent = path.dirname(dir);
-    if (parent === dir || parent === root) break;
-    dir = parent;
-  }
-
-  return cwd.replace(/[^a-zA-Z0-9_\-.+]/g, '_').replace(/_+$/, '');
 }
 
 /**
