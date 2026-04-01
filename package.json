@@ -1,6 +1,6 @@
 {
   "name": "memory-enhancer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Enhances Claude Code memory system with consistency checks, quality validation, and audit logging",
   "main": "mcpServers/index.js",
   "scripts": {
@@ -11,5 +11,24 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/15050584112/memory-enhancer-plugin.git"
+  },
+  "keywords": [
+    "claude-code",
+    "memory",
+    "plugin",
+    "mcp",
+    "memory-enhancer",
+    "consistency-check",
+    "audit-log"
+  ],
+  "author": "wl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/15050584112/memory-enhancer-plugin/issues"
+  },
+  "homepage": "https://github.com/15050584112/memory-enhancer-plugin#readme"
 }
