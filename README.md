@@ -1,95 +1,54 @@
-# memory-enhancer 安装指南
+# memory-enhancer
 
-## 快速安装（5 分钟）
+增强 Claude Code 记忆系统：索引一致性检查、description 质量验证、检索审计日志。
 
-### 前置依赖
+**零外部依赖** — MCP Server 使用原生 Node.js 实现 JSON-RPC over stdio，无需任何 SDK。
+
+## 安装
 
 ```bash
-# 在插件目录下安装 MCP SDK（本地安装，推荐）
-cd memory-enhancer-plugin
-npm install
-
-# 或全局安装
-npm install -g @modelcontextprotocol/sdk
-
-# 验证（注意：SDK 不支持 require 验证，用以下方式）
-node -e "const s = require('./dist/cjs/server/index.js'); console.log('Server:', typeof s.Server)"
+npm install -g memory-enhancer
 ```
 
-### 方式一：Hook 方式（纯配置，无需安装 MCP Server）
+## 配置
 
-编辑 `~/.claude/settings.json`，在 `hooks` 节点添加：
-
-```json
-{
-  "hooks": {
-    "Stop": [
-      {
-        "name": "memory-consistency",
-        "command": "node /absolute/path/to/memory-enhancer-plugin/hooks/stop-hook.js",
-        "activeForm": "Memory consistency check"
-      }
-    ],
-    "SessionEnd": [
-      {
-        "name": "memory-backup",
-        "command": "node /absolute/path/to/memory-enhancer-plugin/hooks/session-end-hook.js",
-        "activeForm": "Memory backup"
-      }
-    ]
-  }
-}
-```
-
-重启 Claude Code 生效。
-
-### 方式二：MCP Server 方式（推荐，可主动调用工具）
-
-编辑 `~/.claude/settings.json`：
+编辑 `~/.claude/settings.json`，添加：
 
 ```json
 {
   "mcpServers": {
     "memory-enhancer": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/absolute/path/to/memory-enhancer-plugin/mcpServers/index.js"]
+      "command": "memory-enhancer"
     }
   },
   "hooks": {
-    "Stop": [
-      {
-        "name": "memory-consistency",
-        "command": "node /absolute/path/to/memory-enhancer-plugin/hooks/stop-hook.js",
-        "activeForm": "Memory consistency check"
-      }
-    ]
+    "Stop": [{
+      "name": "memory-consistency",
+      "command": "node ~/.claude/plugins/memory-enhancer/hooks/stop-hook.js",
+      "activeForm": "Memory consistency check"
+    }],
+    "SessionEnd": [{
+      "name": "memory-backup",
+      "command": "node ~/.claude/plugins/memory-enhancer/hooks/session-end-hook.js",
+      "activeForm": "Memory backup"
+    }]
   }
 }
 ```
 
-### 方式三：Plugin 方式（待 Claude Code 支持第三方插件安装后使用）
+重启 Claude Code 生效。
 
-```bash
-# 将 memory-enhancer-plugin 目录放到插件目录
-cp -r memory-enhancer-plugin ~/.claude/plugins/
-
-# 使用 Claude Code 命令安装
-/plugin install memory-enhancer
-```
-
----
-
-## 使用方式
+## 使用
 
 ### 自动运行（Stop Hook）
 
-无需任何操作。每次 Claude 回复结束后，自动：
+无需任何操作。每次 Claude 回复结束后自动：
 1. 检查孤儿索引并修复
 2. 检查 description 质量
 3. 写入审计日志
 
-### 主动调用（MCP Server）
+### 主动调用
 
 在 Claude Code 中直接说：
 
@@ -101,69 +60,30 @@ cp -r memory-enhancer-plugin ~/.claude/plugins/
 @mcp/memory-enhancer memory_backup
 ```
 
-或使用 `/mcp` 命令交互式调用。
-
----
-
 ## 工具一览
 
-| 工具名 | 说明 |
-|--------|------|
-| `memory_index_consistency` | 索引一致性检查，自动修复孤儿索引 |
-| `memory_quality_check` | 检查 description 质量，提供改进建议 |
+| 工具 | 说明 |
+|------|------|
+| `memory_index_consistency` | 检查并自动修复孤儿索引 |
+| `memory_quality_check` | description 质量检查 + 改进建议 |
 | `memory_audit` | 写入检索审计日志 |
 | `memory_search` | 关键词搜索（无 embedding） |
-| `memory_stats` | 统计：文件数、类型分布、健康度 |
+| `memory_stats` | 文件数、类型分布、健康度 |
 | `memory_backup` | 手动触发 MEMORY.md 备份 |
-
----
 
 ## 文件结构
 
 ```
-memory-enhancer-plugin/
-├── manifest.json              ← 插件元数据
-├── README.md                 ← 本文件
+memory-enhancer/
+├── manifest.json
 ├── package.json
-├── hooks/
-│   ├── stop-hook.js          ← Stop Hook：索引修复 + 质量检查
-│   └── session-end-hook.js    ← SessionEnd Hook：备份 + 日志轮转
 ├── mcpServers/
-│   └── index.js              ← MCP Server：主动工具集
-└── node_modules/              ← MCP SDK（本地安装，运行时代替全局解析）
-    └── @modelcontextprotocol/
+│   └── index.js      ← MCP Server（零依赖原生实现）
+└── hooks/
+    ├── stop-hook.js      ← Stop Hook
+    └── session-end-hook.js ← SessionEnd Hook
 ```
-
----
-
-## 故障排查
-
-### Hook 未触发
-
-```bash
-# 检查配置是否正确
-cat ~/.claude/settings.json | python3 -m json.tool | grep -A5 '"hooks"'
-```
-
-### MCP Server 报错 "Cannot find module" 或 dist/cjs/index.js
-
-这是 `@modelcontextprotocol/sdk` v1.29.0 的已知 bug：package 声明了根导出但文件实际缺失。**本地安装即可解决**：
-
-```bash
-cd memory-enhancer-plugin
-npm install
-# 本地 node_modules 会覆盖全局解析
-```
-
-### 找不到记忆目录
-
-Hook 会自动向上查找 `.claude/memory` 目录。如果你的记忆目录在不同路径，可以：
-
-1. 设置 `CLAUDE_CODE_REMOTE_MEMORY_DIR` 环境变量
-2. 或在 MCP 调用时传入 `memoryDir` 参数
-
----
 
 ## 卸载
 
-从 `~/.claude/settings.json` 中删除对应的 `hooks` 和 `mcpServers` 条目即可。
+从 `settings.json` 删除对应条目即可。
