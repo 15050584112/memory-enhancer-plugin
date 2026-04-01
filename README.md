@@ -5,11 +5,15 @@
 ### 前置依赖
 
 ```bash
-# 安装 MCP SDK（Node.js）
+# 在插件目录下安装 MCP SDK（本地安装，推荐）
+cd memory-enhancer-plugin
+npm install
+
+# 或全局安装
 npm install -g @modelcontextprotocol/sdk
 
-# 验证
-node -e "require('@modelcontextprotocol/sdk'); console.log('OK')"
+# 验证（注意：SDK 不支持 require 验证，用以下方式）
+node -e "const s = require('./dist/cjs/server/index.js'); console.log('Server:', typeof s.Server)"
 ```
 
 ### 方式一：Hook 方式（纯配置，无需安装 MCP Server）
@@ -124,8 +128,10 @@ memory-enhancer-plugin/
 ├── hooks/
 │   ├── stop-hook.js          ← Stop Hook：索引修复 + 质量检查
 │   └── session-end-hook.js    ← SessionEnd Hook：备份 + 日志轮转
-└── mcpServers/
-    └── index.js              ← MCP Server：主动工具集
+├── mcpServers/
+│   └── index.js              ← MCP Server：主动工具集
+└── node_modules/              ← MCP SDK（本地安装，运行时代替全局解析）
+    └── @modelcontextprotocol/
 ```
 
 ---
@@ -139,15 +145,14 @@ memory-enhancer-plugin/
 cat ~/.claude/settings.json | python3 -m json.tool | grep -A5 '"hooks"'
 ```
 
-### MCP Server 报错 "sdk not found"
+### MCP Server 报错 "Cannot find module" 或 dist/cjs/index.js
+
+这是 `@modelcontextprotocol/sdk` v1.29.0 的已知 bug：package 声明了根导出但文件实际缺失。**本地安装即可解决**：
 
 ```bash
-# 全局安装
-npm install -g @modelcontextprotocol/sdk
-
-# 或本地安装
 cd memory-enhancer-plugin
 npm install
+# 本地 node_modules 会覆盖全局解析
 ```
 
 ### 找不到记忆目录

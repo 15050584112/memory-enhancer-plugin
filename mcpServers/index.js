@@ -21,20 +21,30 @@ const fs = require('fs');
 const path = require('path');
 
 // ─── MCP SDK ─────────────────────────────────────────────────────────────────
-
-// 使用 @modelcontextprotocol/sdk
+//
+// SDK v1.29.0 bug workaround: root export paths (./dist/cjs/index.js) are missing
+// from the npm package. Use explicit subpath exports instead.
+//
 // npm install @modelcontextprotocol/sdk
+// (local install in plugin dir, or global install)
+//
+const sdkRoot = () => {
+  // Try local node_modules relative to this file
+  const localPath = path.join(__dirname, '..', 'node_modules', '@modelcontextprotocol', 'sdk');
+  if (fs.existsSync(path.join(localPath, 'package.json'))) return localPath;
+  // Fall back to global/parent resolution
+  return '@modelcontextprotocol/sdk';
+};
+
 let Server, StdioServerTransport;
 try {
-  const sdk = require('@modelcontextprotocol/sdk');
-  Server = sdk.Server;
-  StdioServerTransport = sdk.StdioServerTransport;
-} catch {
-  // SDK 未安装时给出友好错误
+  Server = require(path.join(sdkRoot(), 'dist', 'cjs', 'server', 'index.js')).Server;
+  ({ StdioServerTransport } = require(path.join(sdkRoot(), 'dist', 'cjs', 'server', 'stdio.js')));
+} catch (e) {
   console.error(
-    'Error: @modelcontextprotocol/sdk not found.\n' +
-    'Install it with: npm install -g @modelcontextprotocol/sdk\n' +
-    'Or: npm install @modelcontextprotocol/sdk'
+    'Error loading MCP SDK: ' + e.message + '\n' +
+    'Install it with: npm install @modelcontextprotocol/sdk\n' +
+    '(run this inside the memory-enhancer-plugin directory or globally)'
   );
   process.exit(1);
 }
@@ -42,7 +52,7 @@ try {
 const {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-} = require('@modelcontextprotocol/sdk/types.js');
+} = require(path.join(sdkRoot(), 'dist', 'cjs', 'types.js'));
 
 // ─── 常量 ────────────────────────────────────────────────────────────────────
 
