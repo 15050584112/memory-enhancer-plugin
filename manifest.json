@@ -1,0 +1,31 @@
+{
+  "name": "memory-enhancer",
+  "version": "1.0.0",
+  "description": "增强 Claude Code 记忆系统：索引一致性检查、description 质量验证、检索审计日志",
+  "author": "memory-enhancer",
+  "hooks": {
+    "Stop": [
+      {
+        "name": "memory-consistency",
+        "command": "node {PLUGIN_DIR}/hooks/stop-hook.js",
+        "activeForm": "Memory consistency check"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "name": "memory-backup",
+        "command": "node {PLUGIN_DIR}/hooks/session-end-hook.js",
+        "activeForm": "Memory backup"
+      }
+    ]
+  },
+  "mcpServers": {
+    "memory-enhancer": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["{PLUGIN_DIR}/mcpServers/index.js"]
+    }
+  },
+  "requiredPermissions": [],
+  "compatibleVersion": ">=2.0.0"
+}
