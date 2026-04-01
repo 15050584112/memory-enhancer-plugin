@@ -24,14 +24,18 @@ npm install -g memory-enhancer
   },
   "hooks": {
     "Stop": [{
-      "name": "memory-consistency",
-      "command": "node ~/.claude/plugins/memory-enhancer/hooks/stop-hook.js",
-      "activeForm": "Memory consistency check"
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "node ~/.claude/plugins/memory-enhancer/hooks/stop-hook.js"
+      }]
     }],
     "SessionEnd": [{
-      "name": "memory-backup",
-      "command": "node ~/.claude/plugins/memory-enhancer/hooks/session-end-hook.js",
-      "activeForm": "Memory backup"
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "node ~/.claude/plugins/memory-enhancer/hooks/session-end-hook.js"
+      }]
     }]
   }
 }
