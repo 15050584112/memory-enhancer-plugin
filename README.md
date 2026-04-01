@@ -27,14 +27,14 @@ npm install -g memory-enhancer
       "matcher": "",
       "hooks": [{
         "type": "command",
-        "command": "node ~/.claude/plugins/memory-enhancer/hooks/stop-hook.js"
+        "command": "memory-enhancer-stop"
       }]
     }],
     "SessionEnd": [{
       "matcher": "",
       "hooks": [{
         "type": "command",
-        "command": "node ~/.claude/plugins/memory-enhancer/hooks/session-end-hook.js"
+        "command": "memory-enhancer-session-end"
       }]
     }]
   }

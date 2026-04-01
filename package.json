@@ -4,7 +4,9 @@
   "description": "增强 Claude Code 记忆系统：索引一致性检查、description 质量验证、检索审计日志",
   "main": "mcpServers/index.js",
   "bin": {
-    "memory-enhancer": "mcpServers/index.js"
+    "memory-enhancer": "mcpServers/index.js",
+    "memory-enhancer-stop": "hooks/stop-hook.js",
+    "memory-enhancer-session-end": "hooks/session-end-hook.js"
   },
   "files": [
     "mcpServers/",
