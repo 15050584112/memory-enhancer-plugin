@@ -1,6 +1,6 @@
 {
   "name": "memory-enhancer",
-  "version": "1.0.4",
+  "version": "1.0.3",
   "description": "Enhances Claude Code memory system with consistency checks, quality validation, and audit logging",
   "main": "mcpServers/index.js",
   "files": [
@@ -25,12 +25,24 @@
   },
   "keywords": [
     "claude-code",
+    "claude",
     "memory",
+    "memory-enhancer",
     "plugin",
     "mcp",
-    "memory-enhancer",
+    "model-context-protocol",
     "consistency-check",
-    "audit-log"
+    "quality-validation",
+    "audit-log",
+    "backup",
+    "index",
+    "hooks",
+    "mcp-server",
+    "memory-management",
+    "orphan-index",
+    "description-quality",
+    "search",
+    "stats"
   ],
   "author": "wl",
   "license": "MIT",
