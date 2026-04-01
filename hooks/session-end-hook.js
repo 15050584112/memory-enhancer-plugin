@@ -128,7 +128,7 @@ function findMemoryDir(cwd) {
 
   // 2. 查找 ~/.claude/projects/<encoded-path>/memory
   const home = process.env.HOME || '';
-  const encodedPath = '-' + cwd.replace(/\//g, '-').replace(/-+$/, '');
+  const encodedPath = cwd.replace(/\//g, '-').replace(/-+$/, '');
   const projectMem = path.join(home, '.claude', 'projects', encodedPath, 'memory');
   if (fs.existsSync(projectMem)) return projectMem;
 

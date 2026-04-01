@@ -237,7 +237,7 @@ function findMemoryDir(cwd) {
   // 2. 查找 ~/.claude/projects/<encoded-path>/memory
   // Claude Code 路径映射: /Users/foo/bar → -Users-foo-bar
   const home = process.env.HOME || '';
-  const encodedPath = '-' + cwd.replace(/\//g, '-').replace(/-+$/, '');
+  const encodedPath = cwd.replace(/\//g, '-').replace(/-+$/, '');
   const projectMem = path.join(home, '.claude', 'projects', encodedPath, 'memory');
   if (fs.existsSync(projectMem)) return projectMem;
 
