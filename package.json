@@ -1,6 +1,6 @@
 {
   "name": "memory-enhancer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Enhances Claude Code memory system with consistency checks, quality validation, and audit logging",
   "main": "mcpServers/index.js",
   "files": [
