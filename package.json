@@ -1,8 +1,15 @@
 {
   "name": "memory-enhancer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Enhances Claude Code memory system with consistency checks, quality validation, and audit logging",
   "main": "mcpServers/index.js",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "mcpServers/",
+    "hooks/",
+    "manifest.json"
+  ],
   "scripts": {
     "test": "node hooks/stop-hook.js"
   },
